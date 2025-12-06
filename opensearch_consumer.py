@@ -5,6 +5,7 @@ This script consumes JSON events from a Kafka topic and indexes them into an Ope
 import json
 import logging
 from opensearchpy import OpenSearch
+from opensearchpy.helpers import bulk
 from kafka import KafkaConsumer
 
 # Configure logging
@@ -33,24 +34,23 @@ def exract_id(change_event):
     """Extract unique ID from the change event"""
     return change_event.get("meta", {}).get("id")
 
-def index_document(doc):
-    """Index a document to OpenSearch"""
+def bulk_request(actions):
+    """Perform bulk indexing to OpenSearch"""
     try:
-        doc_id = exract_id(doc)
-        response = opensearch_client.index(
-            index="wikimedia",
-            id=doc_id,
-            body=doc,
-        )
-        logger.info("Document indexed: %s", response["_id"])
+        response = bulk(opensearch_client, actions)
+        logger.info("Bulk indexing completed: %s", response)
     except Exception as e:
-        logger.error("Error indexing document: %s", e)
+        logger.error("Error during bulk indexing: %s", e)
 
 if __name__ == "__main__":
     logger.info("Starting Kafka consumer for wikimedia.recentchange topic...")
     try:
         for message in consumer:
-            index_document(message.value)
+            bulk_request([{
+                "_index": "wikimedia",
+                "_id": exract_id(message.value),
+                "_source": message.value
+            }])
     except KeyboardInterrupt:
         logger.info("Consumer stopped by user")
     finally:
