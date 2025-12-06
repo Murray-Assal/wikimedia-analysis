@@ -1,0 +1,4 @@
+kafka-python
+requests
+python-snappy
+opensearch-py

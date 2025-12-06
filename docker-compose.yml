@@ -40,6 +40,30 @@ services:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
     restart: unless-stopped
+  
+  opensearch:
+    image: opensearchproject/opensearch:2.10.0
+    container_name: opensearch
+    environment:
+      discovery.type: single-node
+      plugins.security.disabled: "true"
+      compatibility.override_main_response_version: "true"
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    restart: unless-stopped
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.10.0
+    container_name: opensearch-dashboards
+    ports:
+      - "5601:5601"
+    environment:
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
+    depends_on:
+      - opensearch
+    restart: unless-stopped
 
 volumes:
   kafka_data:
