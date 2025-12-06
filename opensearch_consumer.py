@@ -29,14 +29,20 @@ consumer = KafkaConsumer(
     group_id="opensearch-consumer-group"
 )
 
+def exract_id(change_event):
+    """Extract unique ID from the change event"""
+    return change_event.get("meta", {}).get("id")
+
 def index_document(doc):
     """Index a document to OpenSearch"""
     try:
+        doc_id = exract_id(doc)
         response = opensearch_client.index(
             index="wikimedia",
+            id=doc_id,
             body=doc,
         )
-        logger.info("Document indexed: %s", response['_id'])
+        logger.info("Document indexed: %s", response["_id"])
     except Exception as e:
         logger.error("Error indexing document: %s", e)
 
