@@ -31,11 +31,18 @@ consumer = KafkaConsumer(
 )
 
 def exract_id(change_event):
-    """Extract unique ID from the change event"""
+    """Extract unique ID from the change event
+    
+    change_event: dict
+    return: unique ID as string
+    """
     return change_event.get("meta", {}).get("id")
 
 def bulk_request(actions):
-    """Perform bulk indexing to OpenSearch"""
+    """Perform bulk indexing to OpenSearch
+    
+    actions: list of dict
+    """
     try:
         response = bulk(opensearch_client, actions)
         logger.info("Bulk indexing completed: %s", response)

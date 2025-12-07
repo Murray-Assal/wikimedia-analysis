@@ -30,8 +30,8 @@ def signal_handler(sig, frame):
     '''
     Docstring for signal_handler
     
-    :param sig: Description
-    :param frame: Description
+    :param sig: Signal number
+    :param frame: Current stack frame
     '''
     global STOP
     STOP = True
@@ -53,14 +53,10 @@ def run_producer(bootstrap_servers: str, topic: str, stream_url: str, group_id: 
     '''
     Docstring for run_producer
     
-    :param bootstrap_servers: Description
-    :type bootstrap_servers: str
-    :param topic: Description
-    :type topic: str
-    :param stream_url: Description
-    :type stream_url: str
-    :param group_id: Description
-    :type group_id: str
+    :param bootstrap_servers: Comma-separated list of Kafka bootstrap servers
+    :param topic: Kafka topic to produce to
+    :param stream_url: URL of the Wikimedia recentchange SSE stream
+    :param group_id: Kafka consumer group ID (optional)
     '''
     logging.info("Connecting to Kafka at %s, producing to topic '%s'", bootstrap_servers, topic)
 
@@ -76,7 +72,7 @@ def run_producer(bootstrap_servers: str, topic: str, stream_url: str, group_id: 
 
     headers = {
     "Accept": "text/event-stream",
-    "User-Agent": "MuradAsalKafkaProducer/1.0 (https://github.com/yourrepo)"
+    "User-Agent": "MuradAsalKafkaProducer/1.0 (https://https://github.com/Murray-Assal/wikimedia-analysis)"
     }
     with requests.get(stream_url, headers=headers, stream=True, timeout=60) as resp:
         if resp.status_code != 200:
